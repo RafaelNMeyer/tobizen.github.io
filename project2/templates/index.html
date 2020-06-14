@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='handlebars-v4.7.6.js') }}"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+    <script src="https://kit.fontawesome.com/6344546565.js" crossorigin="anonymous"></script>
+    <script id="channel-choice" type="text/x-handlebars-template">
+        <div class="channel-choice">
+            {% raw %}
+            <h1 class="channel-name">{{channel_name}}</h1>
+            {% endraw %}
+        </div>
+    </script>
+
+    <script id="channel-messages" type="text/x-handlebars-template">
+        <div id="header-channel-name">
+            {% raw %}
+            <h1 id="channel-name">{{channel_name}}</h1>
+            {% endraw %}
+        </div>
+
+        <div id="messages-content">
+            <div id="all-messages"></div>
+            <div id="messages-inputs">
+                <input id="message" type="text" autofocus autocomplete="off">
+                <div id="send-message"><i id="plane" class="fas fa-paper-plane"></i></div>
+            </div>
+        </div>
+    </script>
+
+    <script id="messages" type="text/x-handlebars-template">
+         {% raw %}
+    <div class="messages">
+            <div class="message-header">
+                <p class="date-time">{{date_time}}</p>
+                <i class="fas fa-times"></i>
+            </div>
+            <p class="user">{{user}}</p>
+            <p class="message-id" style="display: none;">{{message_id}}</p>
+            <p class="message-sent">{{message}}</p>
+        </div>
+        {% endraw %}
+    </script>
+
+    <script id="create-channel" type="text/x-handlebars-template">
+        {% raw %}
+        <h2 id="username">Hi {{username}}. Enjoy chatting.</h2>
+        {% endraw %}
+        <div id="create-channel-form">
+            <input id="create-channel-name" type="text" placeholder="Create a channel">
+            <button id="create-channel-button">Create channel</button>
+        </div>
+    </script>
+
+
+
+</head>
+
+<body>
+    <div id="columns">
+        <div id="left">
+            <header>
+                <h1 id="header-title">Hannya</h1>
+            </header>
+
+            <div class="container">
+                <div id="user-form" class="forms">
+                    <h2>Enter a username so people know who you are.</h2>
+                    <form>
+                        <input id="name" type="text" placeholder="Name" autofocus>
+                        <button id="submit-button">Submit</button>
+                    </form>
+                </div>
+            </div>
+
+
+            <div id="create-channel-div" class="forms"></div>
+            <div id="channels-div"></div>
+        </div>
+
+        <div id="channel-div"></div>
+    </div>
+
+</body>
+
+</html>
