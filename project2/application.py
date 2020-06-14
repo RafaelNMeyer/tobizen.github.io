@@ -80,27 +80,29 @@ def delete_message(data):
                     channel.delete_message(m)
     emit("announce delete", m_id,broadcast=True)
 
-@socketio.on("exists")
-def exists(data):
-    exists = False
-    for channel in channels:
-        if channel.channel_name == data["channel_name"]:
-            exists = True
-    emit("exists channel", exists, broadcast=False)
+# @socketio.on("exists")
+# def exists(data):
+#     exists_channel = {'e':False, 'channel_name':data['channel_name']}
+#     for channel in channels:
+#         if channel.channel_name == data["channel_name"]:
+#             exists = True
+#     emit("exists channel", exists_channel, broadcast=False)
 
 @socketio.on("create channel")
 def channel(data):
     exists = False
+    broad = True
     channelJSON = False
     for channel in channels:
         if channel.channel_name == data["channel_name"]:
             exists = True
+            broad = False
     if not exists:
         channel = Channel(data["channel_name"])
         channelJSON = json.dumps(channel, indent=4, cls=Encoder)
         channels.append(channel)
     ce = {"c":channelJSON, "e":exists}
-    emit("announce channel", ce, broadcast=True)
+    emit("announce channel", ce, broadcast=broad)
 
 @socketio.on("load channels")
 def load_channels():
@@ -128,10 +130,10 @@ def send_message(data):
     date_time = date_now.strftime("%d/%m/%Y %H:%M:%S") 
     m = Message(message=message, user=user, date=date_time)
     mJSON = json.dumps(m, indent=4, cls=Encoder)
-    mJSON_counter = {'mJSON': mJSON, 'counter': 0}
+    mJSON_counter_channel = {'mJSON':mJSON, 'counter':0, 'channel':channel_name}
     for channel in channels:
         if (channel.channel_name == channel_name):
             channel.add_message(m)
-            mJSON_counter['counter'] = channel.message_counter
-    emit("announce message", mJSON_counter, broadcast=True)
+            mJSON_counter_channel['counter'] = channel.message_counter
+    emit("announce message", mJSON_counter_channel, broadcast=True)
     

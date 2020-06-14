@@ -65,15 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (element.id === 'create-channel-button') {
             const channel_name = document.querySelector('#create-channel-name').value;
-            socket.emit('exists', { 'channel_name': channel_name });
-            socket.on('exists channel', data => {
-                if (data) {
-                    alert('this channel already exists')
-                } else {
-                    document.querySelector('#create-channel-name').value = '';
-                    socket.emit('create channel', { 'channel_name': channel_name });
-                }
-            });
+            // socket.emit('exists', {'channel_name': channel_name });
+            socket.emit('create channel', { 'channel_name': channel_name });
         }
 
 
@@ -100,6 +93,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     });
 
+    // socket.on('exists channel', data => {
+    //     if (data.e) {
+    //         alert('this channel already exists')
+    //     } else {
+    //         document.querySelector('#create-channel-name').value = '';
+    //         socket.emit('create channel', { 'channel_name': channel_name });
+    //     }
+    // });
+
     socket.on('announce delete', data => {
         document.querySelectorAll('.message-id').forEach(element => {
             if (element.innerHTML === data) {
@@ -110,8 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('announce channel', data => {
         const dataJSON = JSON.parse(data.c);
-        const channel = channel_template({ 'channel_name': `${dataJSON.channel_name}` });
-        document.querySelector('#channels-div').innerHTML += channel;
+        if (!data.e) {
+            const channel = channel_template({ 'channel_name': `${dataJSON.channel_name}` });
+            document.querySelector('#channels-div').innerHTML += channel;
+            document.querySelector('#create-channel-name').value = '';
+        } else {
+            alert('this channel already exists');
+        }
     });
 
     document.addEventListener('keyup', event => {
@@ -130,18 +137,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     socket.on('announce message', data => {
         dataJSON = JSON.parse(data.mJSON);
-        const message = messages_template({ 'message': dataJSON.message, 'date_time': dataJSON.date, 'user': dataJSON.user.name, 'message_id': dataJSON.message_id });
-        if (document.querySelector('#all-messages') != null) {
-            if (data.counter > 100) {
-                document.querySelector('.messages:first-child').remove();
+        console.log(data.channel);
+        console.log(localStorage.getItem('last_channel'));
+        if (data.channel === localStorage.getItem('last_channel')) {
+            const message = messages_template({ 'message': dataJSON.message, 'date_time': dataJSON.date, 'user': dataJSON.user.name, 'message_id': dataJSON.message_id });
+            if (document.querySelector('#all-messages') != null) {
+                if (data.counter > 100) {
+                    document.querySelector('.messages:first-child').remove();
+                }
+                document.querySelector('#all-messages').innerHTML += message;
+                document.querySelector('#all-messages').scrollTop = document.querySelector('#all-messages').scrollHeight;
             }
-            document.querySelector('#all-messages').innerHTML += message;
-            document.querySelector('#all-messages').scrollTop = document.querySelector('#all-messages').scrollHeight;
-        }
 
-        if (dataJSON.user.id != JSON.parse(localStorage.getItem('username')).id) {
-            if (document.querySelector('.messages:last-child') != null) {
-                document.querySelector('.messages:last-child').className = 'another-user';
+            if (dataJSON.user.id != JSON.parse(localStorage.getItem('username')).id) {
+                if (document.querySelector('.messages:last-child') != null) {
+                    document.querySelector('.messages:last-child').className = 'another-user';
+                }
             }
         }
     });
